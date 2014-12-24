@@ -51,6 +51,7 @@ import jQuery from "ember-views/system/jquery";
 import "ember-views/system/ext";  // for the side effect of extending Ember.run.queues
 
 import CoreView from "ember-views/views/core_view";
+import sanitizeAttributeValue from "ember-views/system/sanitize_attribute_value";
 
 
 /**
@@ -1421,6 +1422,22 @@ var View = CoreView.extend({
     if (!this.removedFromDOM) { this.destroyElement(); }
   },
 
+  /**
+    The HTML `id` of the view's element in the DOM. You can provide this
+    value yourself but it must be unique (just as in HTML):
+
+    ```handlebars
+      {{my-component elementId="a-really-cool-id"}}
+    ```
+
+    If not manually set a default value will be provided by the framework.
+
+    Once rendered an element's `elementId` is considered immutable and you
+    should never change it.
+
+    @property elementId
+    @type String
+  */
   elementId: null,
 
   /**
@@ -2224,7 +2241,8 @@ View.views = {};
 // method.
 View.childViewsProperty = childViewsProperty;
 
-View.applyAttributeBindings = function(elem, name, value) {
+View.applyAttributeBindings = function(elem, name, initialValue) {
+  var value = sanitizeAttributeValue(elem[0], name, initialValue);
   var type = typeOf(value);
 
   // if this changes, also change the logic in ember-handlebars/lib/helpers/binding.js
